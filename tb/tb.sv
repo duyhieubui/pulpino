@@ -118,7 +118,9 @@ module tb;
     .sda_io ( sda_io  ),
     .rst_ni ( s_rst_n )
   );
-
+`ifdef PULP_FPGA_EMUL
+  pulpino
+`else
   pulpino_top
   #(
     .USE_ZERO_RISCY    ( USE_ZERO_RISCY ),
@@ -126,13 +128,15 @@ module tb;
     .ZERO_RV32M        ( ZERO_RV32M     ),
     .ZERO_RV32E        ( ZERO_RV32E     )
    )
+`endif
   top_i
   (
     .clk               ( s_clk        ),
     .rst_n             ( s_rst_n      ),
-
+`ifndef PULP_FPGA_EMUL
     .clk_sel_i         ( 1'b0         ),
     .testmode_i        ( 1'b0         ),
+`endif
     .fetch_enable_i    ( fetch_enable ),
 
     .spi_clk_i         ( spi_sck      ),
@@ -162,13 +166,14 @@ module tb;
     .spi_master_sdi2_i ( spi_master.sdi[2]  ),
     .spi_master_sdi3_i ( spi_master.sdi[3]  ),
 
+`ifndef PULP_FPGA_EMUL
     .scl_pad_i         ( scl_pad_i    ),
     .scl_pad_o         ( scl_pad_o    ),
     .scl_padoen_o      ( scl_padoen_o ),
     .sda_pad_i         ( sda_pad_i    ),
     .sda_pad_o         ( sda_pad_o    ),
     .sda_padoen_o      ( sda_padoen_o ),
-
+`endif
 
     .uart_tx           ( uart_rx      ),
     .uart_rx           ( uart_tx      ),
@@ -180,7 +185,9 @@ module tb;
     .gpio_in           ( gpio_in      ),
     .gpio_out          ( gpio_out     ),
     .gpio_dir          ( gpio_dir     ),
+`ifndef PULP_FPGA_EMUL
     .gpio_padcfg       (              ),
+`endif
 
     .tck_i             ( jtag_if.tck     ),
     .trstn_i           ( jtag_if.trstn   ),

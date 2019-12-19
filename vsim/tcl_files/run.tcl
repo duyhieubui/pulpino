@@ -3,7 +3,7 @@
 exec vsim -64 -do "$0"
 
 set TB_TEST $::env(TB_TEST)
-set VSIM_FLAGS    "-GTEST=\"$TB_TEST\""
+set VSIM_FLAGS    "-GTEST=\"$TB_TEST\" -suppress vopt-3473,vopt-1127"
 
 set TB            tb
 set MEMLOAD       "PRELOAD"

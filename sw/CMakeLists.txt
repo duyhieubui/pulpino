@@ -137,6 +137,10 @@ add_custom_target(vcompile.pl
   COMMAND tcsh -c "env PL_NETLIST=${PL_NETLIST} ./vcompile/vcompile_pl.csh"
   WORKING_DIRECTORY ${PULP_MODELSIM_DIRECTORY}
   ${USES_TERMINAL})
+add_custom_target(vcompile.arty
+  COMMAND tcsh -c "env PL_NETLIST=${PL_NETLIST} ./vcompile/build_fpga_sim.csh"
+  WORKING_DIRECTORY ${PULP_MODELSIM_DIRECTORY}
+  ${USES_TERMINAL})
 
 add_custom_target(vcompile.core.riscy
   COMMAND tcsh ./vcompile/vcompile_riscv.csh

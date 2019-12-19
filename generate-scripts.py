@@ -43,7 +43,10 @@ execute("rm -rf vsim/vcompile/ips/*")
 # creates an IPApproX database
 ipdb = ipstools.IPDatabase(ips_dir="./ips", rtl_dir="./rtl", vsim_dir="./vsim")
 # generate ModelSim/QuestaSim compilation scripts
-ipdb.export_vsim(script_path="vsim/vcompile/ips", target_tech='umc65')
+## DHBui comments this out
+#ipdb.export_vsim(script_path="vsim/vcompile/ips", target_tech='umc65')
+## DHBui adds this line 
+ipdb.export_vsim(script_path="vsim/vcompile/ips")
 # generate vsim.tcl with ModelSim/QuestaSim "linking" script
 ipdb.generate_vsim_tcl("vsim/tcl_files/config/vsim_ips.tcl")
 # generate script to compile all IPs for ModelSim/QuestaSim
