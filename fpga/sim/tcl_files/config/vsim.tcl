@@ -1,6 +1,6 @@
 source tcl_files/config/vsim_ips.tcl
 
-set cmd "vsim -quiet $TB \
+set cmd "vsim -quiet $TB glbl \
   -L pulpino_lib \
   $VSIM_IP_LIBS \
   +nowarnTRAN \

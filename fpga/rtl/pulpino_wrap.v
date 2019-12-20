@@ -48,12 +48,12 @@ module pulpino(
   uart_cts,
   uart_dsr,
 
-  scl_i,
-  scl_o,
-  scl_oen_o,
-  sda_i,
-  sda_o,
-  sda_oen_o,
+  scl_pad_i,
+  scl_pad_o,
+  scl_padoen_o,
+  sda_pad_i,
+  sda_pad_o,
+  sda_padoen_o,
 
   gpio_in,
   gpio_out,
@@ -106,12 +106,12 @@ module pulpino(
   input         uart_cts;
   input         uart_dsr;
 
-  input         scl_i;
-  output        scl_o;
-  output        scl_oen_o;
-  input         sda_i;
-  output        sda_o;
-  output        sda_oen_o;
+  input         scl_pad_i;
+  output        scl_pad_o;
+  output        scl_padoen_o;
+  input         sda_pad_i;
+  output        sda_pad_o;
+  output        sda_padoen_o;
 
   input  [31:0] gpio_in;
   output [31:0] gpio_out;
@@ -183,12 +183,12 @@ module pulpino(
     .uart_cts          ( uart_cts          ), // input
     .uart_dsr          ( uart_dsr          ), // input
 
-    .scl_pad_i         ( scl_i             ),
-    .scl_pad_o         ( scl_o             ),
-    .scl_padoen_o      ( scl_oen_o         ),
-    .sda_pad_i         ( sda_i             ),
-    .sda_pad_o         ( sda_o             ),
-    .sda_padoen_o      ( sda_oen_o         ),
+    .scl_pad_i         ( scl_pad_i         ),
+    .scl_pad_o         ( scl_pad_o         ),
+    .scl_padoen_o      ( scl_padoen_o      ),
+    .sda_pad_i         ( sda_pad_i         ),
+    .sda_pad_o         ( sda_pad_o         ),
+    .sda_padoen_o      ( sda_padoen_o      ),
 
     .gpio_in           ( gpio_in           ),
     .gpio_out          ( gpio_out          ),

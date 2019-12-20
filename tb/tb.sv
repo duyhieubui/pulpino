@@ -13,29 +13,33 @@
 
 `define REF_CLK_PERIOD   (2*15.25us)  // 32.786 kHz --> FLL reset value --> 50 MHz
 `define CLK_PERIOD       40.00ns      // 25 MHz
+// `define CLK_PERIOD       10.00ns      // 100 MHz
+`define XTAL_PERIOD      10.00ns
 
 `define EXIT_SUCCESS  0
 `define EXIT_FAIL     1
 `define EXIT_ERROR   -1
-
+// +define+PULP_FPGA_EMUL is not working with this file
+`define PULP_FPGA_EMUL
 module tb;
   timeunit      1ns;
   timeprecision 1ps;
 
   // +MEMLOAD= valid values are "SPI", "STANDALONE" "PRELOAD", "" (no load of L2)
-  parameter  SPI            = "QUAD";    // valid values are "SINGLE", "QUAD"
+  parameter  SPI            = "SINGLE";    // valid values are "SINGLE", "QUAD"
   parameter  BAUDRATE       = 781250;    // 1562500
   parameter  CLK_USE_FLL    = 0;  // 0 or 1
-  parameter  TEST           = ""; //valid values are "" (NONE), "DEBUG"
+  parameter  TEST           = "DEBUG"; //valid values are "" (NONE), "DEBUG"
   parameter  USE_ZERO_RISCY = 0;
   parameter  RISCY_RV32F    = 0;
-  parameter  ZERO_RV32M     = 1;
+  parameter  ZERO_RV32M     = 0;
   parameter  ZERO_RV32E     = 0;
 
   int           exit_status = `EXIT_ERROR; // modelsim exit code, will be overwritten when successful
 
   string        memload;
   logic         s_clk   = 1'b0;
+  logic         xtal_clk   = 1'b0;
   logic         s_rst_n = 1'b0;
 
   logic         fetch_enable = 1'b0;
@@ -118,8 +122,66 @@ module tb;
     .sda_io ( sda_io  ),
     .rst_ni ( s_rst_n )
   );
+
 `ifdef PULP_FPGA_EMUL
-  pulpino
+   // assign spi_mode = ;
+   
+   arty_top
+     top_i
+       (
+    .rst_n             ( s_rst_n      ),
+    .clk               ( xtal_clk     ),
+    .fetch_enable_i    ( fetch_enable ),
+
+    .spi_clk_i         ( spi_sck      ),
+    .spi_cs_i          ( spi_csn      ),
+    .spi_sdo0_o        ( spi_sdi0     ),
+    .spi_sdi0_i        ( spi_sdo0     ),
+   
+
+    // .spi_master_clk_o  ( spi_master.clk     ),
+    // .spi_master_csn0_o ( spi_master.csn     ),
+    // .spi_master_csn1_o (                    ),
+    // .spi_master_csn2_o (                    ),
+    // .spi_master_csn3_o (                    ),
+    // .spi_master_mode_o ( spi_master.padmode ),
+    // .spi_master_sdo0_o ( spi_master.sdo[0]  ),
+    // .spi_master_sdo1_o ( spi_master.sdo[1]  ),
+    // .spi_master_sdo2_o ( spi_master.sdo[2]  ),
+    // .spi_master_sdo3_o ( spi_master.sdo[3]  ),
+    // .spi_master_sdi0_i ( spi_master.sdi[0]  ),
+    // .spi_master_sdi1_i ( spi_master.sdi[1]  ),
+    // .spi_master_sdi2_i ( spi_master.sdi[2]  ),
+    // .spi_master_sdi3_i ( spi_master.sdi[3]  ),
+
+    // .scl_pad_i         ( scl_pad_i    ),
+    // .scl_pad_o         ( scl_pad_o    ),
+    // .scl_padoen_o      ( scl_padoen_o ),
+    // .sda_pad_i         ( sda_pad_i    ),
+    // .sda_pad_o         ( sda_pad_o    ),
+    // .sda_padoen_o      ( sda_padoen_o ),
+
+    .uart_tx           ( uart_rx      ),
+    .uart_rx           ( uart_tx      ),
+    // .uart_rts          ( s_uart_rts   ),
+    // .uart_dtr          ( s_uart_dtr   ),
+    // .uart_cts          ( 1'b0         ),
+    // .uart_dsr          ( 1'b0         ),
+
+    // .gpio_in           ( gpio_in      ),
+    // .gpio_out          ( gpio_out     ),
+    // .gpio_dir          ( gpio_dir     ),
+    .gpio_o          ( gpio_out[8]     ),
+
+    .tck_i             ( jtag_if.tck     ),
+    .trstn_i           ( jtag_if.trstn   ),
+    .tms_i             ( jtag_if.tms     ),
+    .tdi_i             ( jtag_if.tdi     ),
+    .tdo_o             ( jtag_if.tdo     )
+	);
+   
+// `elsif PULP_FPGA_WRAPPER
+//    pulpino
 `else
   pulpino_top
   #(
@@ -128,12 +190,13 @@ module tb;
     .ZERO_RV32M        ( ZERO_RV32M     ),
     .ZERO_RV32E        ( ZERO_RV32E     )
    )
-`endif
   top_i
   (
-    .clk               ( s_clk        ),
     .rst_n             ( s_rst_n      ),
-`ifndef PULP_FPGA_EMUL
+`ifdef PULP_FPGA_EMUL
+    .clk               ( xtal_clk     ),
+`else
+    .clk               ( s_clk        ),
     .clk_sel_i         ( 1'b0         ),
     .testmode_i        ( 1'b0         ),
 `endif
@@ -166,14 +229,12 @@ module tb;
     .spi_master_sdi2_i ( spi_master.sdi[2]  ),
     .spi_master_sdi3_i ( spi_master.sdi[3]  ),
 
-`ifndef PULP_FPGA_EMUL
     .scl_pad_i         ( scl_pad_i    ),
     .scl_pad_o         ( scl_pad_o    ),
     .scl_padoen_o      ( scl_padoen_o ),
     .sda_pad_i         ( sda_pad_i    ),
     .sda_pad_o         ( sda_pad_o    ),
     .sda_padoen_o      ( sda_padoen_o ),
-`endif
 
     .uart_tx           ( uart_rx      ),
     .uart_rx           ( uart_tx      ),
@@ -195,6 +256,7 @@ module tb;
     .tdi_i             ( jtag_if.tdi     ),
     .tdo_o             ( jtag_if.tdo     )
   );
+`endif
 
   generate
     if (CLK_USE_FLL) begin
@@ -210,6 +272,12 @@ module tb;
         #(`CLK_PERIOD/2);
         s_clk = 1'b1;
         forever s_clk = #(`CLK_PERIOD/2) ~s_clk;
+      end
+      initial
+      begin
+        #(`XTAL_PERIOD/2);
+        xtal_clk = 1'b1;
+        forever xtal_clk = #(`XTAL_PERIOD/2) ~xtal_clk;
       end
     end
   endgenerate
