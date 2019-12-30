@@ -1,0 +1,20 @@
+diff --git a/apb_spi_master.sv b/apb_spi_master.sv
+index 0a84923..266d6ad 100644
+--- a/apb_spi_master.sv
++++ b/apb_spi_master.sv
+@@ -36,6 +36,7 @@ module apb_spi_master
+     output logic                      spi_csn2,
+     output logic                      spi_csn3,
+     output logic                [1:0] spi_mode,
++    output logic                [3:0] spi_oen,
+     output logic                      spi_sdo0,
+     output logic                      spi_sdo1,
+     output logic                      spi_sdo2,
+@@ -366,6 +367,7 @@ module apb_spi_master
+         .spi_csn2               ( spi_csn2               ),
+         .spi_csn3               ( spi_csn3               ),
+         .spi_mode               ( spi_mode               ),
++        .spi_oen                ( spi_oen                ),
+         .spi_sdo0               ( spi_sdo0               ),
+         .spi_sdo1               ( spi_sdo1               ),
+         .spi_sdo2               ( spi_sdo2               ),
