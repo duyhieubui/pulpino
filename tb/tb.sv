@@ -27,9 +27,13 @@ module tb;
 
   // +MEMLOAD= valid values are "SPI", "STANDALONE" "PRELOAD", "" (no load of L2)
   parameter  SPI            = "SINGLE";    // valid values are "SINGLE", "QUAD"
-  parameter  BAUDRATE       = 781250;    // 1562500
+  // parameter  BAUDRATE       = 781250;    // 1562500
+  // parameter  BAUDRATE       = 1562500;
+  // parameter BAUDRATE = 120192;
+   parameter BAUDRATE = 9600;
+   
   parameter  CLK_USE_FLL    = 0;  // 0 or 1
-  parameter  TEST           = "DEBUG"; //valid values are "" (NONE), "DEBUG"
+  parameter  TEST           = ""; //valid values are "" (NONE), "DEBUG"
   parameter  USE_ZERO_RISCY = 0;
   parameter  RISCY_RV32F    = 0;
   parameter  ZERO_RV32M     = 0;
@@ -79,6 +83,10 @@ module tb;
 
   logic [31:0]  recv_data;
 
+   logic 	qspi_clk_o;
+   logic 	qspi_csn_o;
+   wire [3:0] 	qspi_dq;
+
   jtag_i jtag_if();
 
   adv_dbg_if_t adv_dbg_if = new(jtag_if);
@@ -125,6 +133,24 @@ module tb;
 
 `ifdef PULP_FPGA_EMUL
    // assign spi_mode = ;
+   s25fl128s
+     #(
+       .UserPreload (1)
+       ,.mem_file_name ("helloworld.wmf")//"s25fl128s.mem";
+       ,.otp_file_name ("non")//"none";
+       )
+   u_spi_flash
+     (
+      // Data Inputs/Outputs
+      .SI (qspi_dq[0]),
+      .SO (qspi_dq[1]),
+      // Controls
+      .SCK (qspi_clk_o),
+      .CSNeg (qspi_csn_o),
+      .RSTNeg (s_rst_n) ,
+      .WPNeg (qspi_dq[2]),
+      .HOLDNeg (qspi_dq[3])
+      );
    
    arty_top
      top_i
@@ -138,6 +164,9 @@ module tb;
     .spi_sdo0_o        ( spi_sdi0     ),
     .spi_sdi0_i        ( spi_sdo0     ),
    
+    .qspi_clk_o        (qspi_clk_o),
+    .qspi_csn_o        (qspi_csn_o),
+    .qspi_dq           (qspi_dq),
 
     // .spi_master_clk_o  ( spi_master.clk     ),
     // .spi_master_csn0_o ( spi_master.csn     ),
@@ -171,7 +200,7 @@ module tb;
     // .gpio_in           ( gpio_in      ),
     // .gpio_out          ( gpio_out     ),
     // .gpio_dir          ( gpio_dir     ),
-    .gpio_o          ( gpio_out[8]     ),
+    .gpio_o          ( gpio_out[8:0]     ),
 
     .tck_i             ( jtag_if.tck     ),
     .trstn_i           ( jtag_if.trstn   ),
@@ -312,10 +341,10 @@ module tb;
     if (memload != "STANDALONE")
     begin
       /* Configure JTAG and set boot address */
-      adv_dbg_if.jtag_reset();
-      adv_dbg_if.jtag_softreset();
-      adv_dbg_if.init();
-      adv_dbg_if.axi4_write32(32'h1A10_7008, 1, 32'h0000_0000);
+      // adv_dbg_if.jtag_reset();
+      // adv_dbg_if.jtag_softreset();
+      // adv_dbg_if.init();
+      // adv_dbg_if.axi4_write32(32'h1A10_7008, 1, 32'h0000_0000);
     end
 
     if (memload == "PRELOAD")

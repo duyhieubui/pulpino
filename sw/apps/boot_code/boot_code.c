@@ -29,7 +29,13 @@ int main()
 {
   /* sets direction for SPI master pins with only one CS */
   spi_setup_master(1);
-  uart_set_cfg(0, 1);
+  /* Default baurate by pulpino */
+  /* uart_set_cfg(0, 1); */
+  /* Set baudrate to 9600 8N1 cpu clock is 25MHz*/
+  uart_set_cfg(0,161);
+  set_gpio_pin_direction(0, DIR_OUT);
+  set_pin_function(0, FUNC_GPIO);
+  set_gpio_pin_value(0, 1);
 
   for (int i = 0; i < 3000; i++) {
     //wait some time to have proper power up of external flash
@@ -39,7 +45,8 @@ int main()
         asm volatile ("l.nop");
     #endif
   }
-
+  set_gpio_pin_value(0, 0);
+  uart_send("SISLAB's pulpino!\n\r", 19);
   /* divide sys clock by 4 */
   *(volatile int*) (SPI_REG_CLKDIV) = 0x4;
 
@@ -159,8 +166,7 @@ int check_spi_flash() {
   int rd_id[2];
 
   // reads flash ID
-  spi_setup_cmd_addr(0x9F, 8, 0, 0);
-  spi_set_datalen(64);
+  spi_setup_cmd_addr(0x9F, 8, 0, 0);  spi_set_datalen(64);
   spi_setup_dummy(0, 0);
   spi_start_transaction(SPI_CMD_RD, SPI_CSN0);
   spi_read_fifo(rd_id, 64);

@@ -44,7 +44,8 @@ vmap unisim_ver xilinx_libs/unisims_ver
 
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_pulpino.sh  || exit 1
 vlog -sv -work $MSIM_LIBS_PATH/pulpino_lib ../rtl/pulpino_wrap.v
-vlog -sv -work $MSIM_LIBS_PATH/pulpino_lib ../rtl/arty_top.v
+vlog -work work spansion_spi_flash/S25fl128s/model/s25fl128s.v
+vlog -sv -work $MSIM_LIBS_PATH/pulpino_lib ../rtl/arty_top.sv
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_tb.sh       || exit 1
 vlog $XILINX_VIVADO/data/verilog/src/glbl.v
 

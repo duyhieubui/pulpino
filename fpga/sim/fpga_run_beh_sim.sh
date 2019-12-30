@@ -5,4 +5,4 @@ export ZERO_RV32M=0
 export ZERO_RV32E=0
 export PL_NETLIST=""
 export TB_TEST=""
-vsim -c -64 -do 'source tcl_files/run_spi.tcl; log -r /*; run -a; exit;'
+vsim -64 -c -do 'source tcl_files/run_spi.tcl; log -r /*; run -a; exit;'
