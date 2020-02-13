@@ -1,0 +1,24 @@
+diff --git a/spi_master_controller.sv b/spi_master_controller.sv
+index 345761b..d02852e 100644
+--- a/spi_master_controller.sv
++++ b/spi_master_controller.sv
+@@ -45,6 +45,7 @@ module spi_master_controller
+     output logic                          spi_csn2,
+     output logic                          spi_csn3,
+     output logic                    [1:0] spi_mode,
++    output logic                    [3:0] spi_oen,
+     output logic                          spi_sdo0,
+     output logic                          spi_sdo1,
+     output logic                          spi_sdo2,
+@@ -524,9 +525,11 @@ module spi_master_controller
+       do_rx       <= 1'b0;
+       do_tx       <= 1'b0;
+       spi_mode    <= `SPI_QUAD_RX;
++      spi_oen <= 4'b1111;
+     end
+     else
+     begin
++      spi_oen <= spi_en_tx ? (en_quad ? 4'b0000 : 4'b1110) : 4'b1111;
+       state <= state_next;
+       spi_mode <= s_spi_mode;
+       if (spi_qrd || spi_qwr)
