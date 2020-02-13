@@ -20,17 +20,16 @@
 `define EXIT_FAIL     1
 `define EXIT_ERROR   -1
 // +define+PULP_FPGA_EMUL is not working with this file
-`define PULP_FPGA_EMUL
+//`define PULP_FPGA_EMUL
 module tb;
   timeunit      1ns;
   timeprecision 1ps;
 
   // +MEMLOAD= valid values are "SPI", "STANDALONE" "PRELOAD", "" (no load of L2)
   parameter  SPI            = "SINGLE";    // valid values are "SINGLE", "QUAD"
-  // parameter  BAUDRATE       = 781250;    // 1562500
-  // parameter  BAUDRATE       = 1562500;
-  // parameter BAUDRATE = 120192;
-   parameter BAUDRATE = 9600;
+//  parameter  BAUDRATE       = 781250;    // 1562500
+//  parameter BAUDRATE = 9600; // with define of ARTY_A7
+  parameter BAUDRATE = 115200; // with define of ARTY_A7
    
   parameter  CLK_USE_FLL    = 0;  // 0 or 1
   parameter  TEST           = ""; //valid values are "" (NONE), "DEBUG"
@@ -79,7 +78,7 @@ module tb;
 
   logic [31:0]  gpio_in = '0;
   logic [31:0]  gpio_dir;
-  logic [31:0]  gpio_out;
+  wire  [31:0]  gpio_out;
 
   logic [31:0]  recv_data;
 
@@ -132,26 +131,28 @@ module tb;
   );
 
 `ifdef PULP_FPGA_EMUL
-   // assign spi_mode = ;
-   s25fl128s
-     #(
-       .UserPreload (1)
-       ,.mem_file_name ("helloworld.wmf")//"s25fl128s.mem";
-       ,.otp_file_name ("non")//"none";
-       )
-   u_spi_flash
-     (
-      // Data Inputs/Outputs
-      .SI (qspi_dq[0]),
-      .SO (qspi_dq[1]),
-      // Controls
-      .SCK (qspi_clk_o),
-      .CSNeg (qspi_csn_o),
-      .RSTNeg (s_rst_n) ,
-      .WPNeg (qspi_dq[2]),
-      .HOLDNeg (qspi_dq[3])
-      );
+   // // assign spi_mode = ;
+   // s25fl128s
+   //   #(
+   //     .UserPreload (1)
+   //     ,.mem_file_name ("helloworld.vmf")//"s25fl128s.mem";
+   //     ,.otp_file_name ("s25fl128sOTP.mem")//"none";
+   //     ,.TimingModel("S25FL128SAGMFI000_R_30pF")
+   //     )
+   // u_spi_flash
+   //   (
+   //    // Data Inputs/Outputs
+   //    .SI	( qspi_dq[0]	),
+   //    .SO	( qspi_dq[1]	),
+   //    // Controls
+   //    .SCK	( qspi_clk_o	),
+   //    .CSNeg	( qspi_csn_o	),
+   //    .RSTNeg	( 1'b1		) ,
+   //    .WPNeg	(		),
+   //    .HOLDNeg	(		)
+   //    );
    
+
    arty_top
      top_i
        (
@@ -200,7 +201,9 @@ module tb;
     // .gpio_in           ( gpio_in      ),
     // .gpio_out          ( gpio_out     ),
     // .gpio_dir          ( gpio_dir     ),
-    .gpio_o          ( gpio_out[8:0]     ),
+    .gpio               ( gpio_out[24:0] ),
+    .gpio_i             ( gpio_in[31:25] ),
+    .gpio_o             ( gpio_out[31:25]),
 
     .tck_i             ( jtag_if.tck     ),
     .trstn_i           ( jtag_if.trstn   ),
@@ -341,10 +344,11 @@ module tb;
     if (memload != "STANDALONE")
     begin
       /* Configure JTAG and set boot address */
-      // adv_dbg_if.jtag_reset();
-      // adv_dbg_if.jtag_softreset();
-      // adv_dbg_if.init();
-      // adv_dbg_if.axi4_write32(32'h1A10_7008, 1, 32'h0000_0000);
+      adv_dbg_if.jtag_reset();
+      adv_dbg_if.jtag_softreset();
+      adv_dbg_if.init();
+      adv_dbg_if.axi4_write32(32'h1A10_7008, 1, 32'h0000_0000);
+
     end
 
     if (memload == "PRELOAD")

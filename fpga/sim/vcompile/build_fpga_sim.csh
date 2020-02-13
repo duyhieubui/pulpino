@@ -44,7 +44,12 @@ vmap unisim_ver xilinx_libs/unisims_ver
 
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_pulpino.sh  || exit 1
 vlog -sv -work $MSIM_LIBS_PATH/pulpino_lib ../rtl/pulpino_wrap.v
-vlog -work work spansion_spi_flash/S25fl128s/model/s25fl128s.v
+#vlog -work work spansion_spi_flash/S25fl128s/model/s25fl128s.v
+vlib xilinx_libs/fmf
+vmap fmf xilinx_libs/fmf
+vcom -work fmf spansion_spi_flash/S25fl128s/utilities/gen_utils.vhd
+vcom -work fmf spansion_spi_flash/S25fl128s/utilities/conversions.vhd
+vcom -work work spansion_spi_flash/S25fl128s/model/s25fl128s.vhd
 vlog -sv -work $MSIM_LIBS_PATH/pulpino_lib ../rtl/arty_top.sv
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_tb.sh       || exit 1
 vlog $XILINX_VIVADO/data/verilog/src/glbl.v

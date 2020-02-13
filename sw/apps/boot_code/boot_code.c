@@ -51,12 +51,12 @@ int main()
   *(volatile int*) (SPI_REG_CLKDIV) = 0x4;
 
   if (check_spi_flash()) {
-    uart_send("ERROR: Spansion SPI flash not found\n", 36);
+    uart_send("ERROR: Spansion SPI flash not found\n\n", 37);
     while (1);
   }
 
 
-  uart_send("Loading from SPI\n", 17);
+  uart_send("Loading from SPI\n\r", 18);
 
   // sends write enable command
   spi_setup_cmd_addr(0x06, 8, 0, 0);
@@ -101,7 +101,7 @@ int main()
   // Read Instruction RAM
   //-----------------------------------------------------------
 
-  uart_send("Copying Instructions\n", 21);
+  uart_send("Copying Instructions\n\r", 22);
 
   addr = instr_start;
   spi_setup_dummy(8, 0);
@@ -124,7 +124,7 @@ int main()
   // Read Data RAM
   //-----------------------------------------------------------
 
-  uart_send("Copying Data\n", 13);
+  uart_send("Copying Data\n\r", 13);
 
   uart_wait_tx_done();
   addr = data_start;
